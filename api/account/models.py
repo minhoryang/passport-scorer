@@ -1,8 +1,9 @@
 from __future__ import annotations
-from datetime import datetime, timedelta, timezone
+
 import logging
 import secrets
-from typing import Type, Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Type
 
 from django.conf import settings
 from django.db import models
@@ -104,7 +105,7 @@ class Community(models.Model):
         blank=False,
         null=False,
         default=Rules.LIFO,
-        choices=[(Rules.LIFO, "LIFO"), (Rules.FIFO, "FIFO")],
+        choices=Rules.choices(),
     )
     description = models.CharField(
         max_length=100, blank=False, null=False, default="My community"
@@ -114,6 +115,13 @@ class Community(models.Model):
     )
     scorer = models.ForeignKey(
         Scorer, on_delete=models.PROTECT, default=get_default_community_scorer
+    )
+
+    use_case = models.CharField(
+        blank=True,
+        null=True,
+        max_length=100,
+        help_text="The use case that the creator of this community (Scorer) would like to cover",
     )
 
     def get_scorer(self) -> Scorer:
